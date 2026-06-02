@@ -491,7 +491,7 @@ function drawStartScreen() {
 
     // --- Zeile 1: alles über drawingContext ---
     drawingContext.save();
-    drawingContext.font = `400 ${fs1}px 'Degular Mono', monospace`;
+    drawingContext.font = `400 ${fs1}px 'degular-mono', monospace`;
     drawingContext.letterSpacing = "0.18em";
     drawingContext.textAlign = "left";
     drawingContext.textBaseline = "middle";
@@ -513,7 +513,7 @@ function drawStartScreen() {
     let fs2 = sc(90);
     let line2Y = ctaY + fs1 + sc(1);
     drawingContext.save();
-    drawingContext.font = `400 ${fs2}px 'Degular Mono', monospace`;
+    drawingContext.font = `400 ${fs2}px 'degular-mono', monospace`;
     drawingContext.letterSpacing = "0.12em";
     drawingContext.textAlign = "left";
     drawingContext.textBaseline = "top";
@@ -747,7 +747,7 @@ function drawUI() {
   let padY = sc(10);
 
   drawingContext.save();
-  drawingContext.font = `400 ${numFS}px 'Degular Mono', monospace`;
+  drawingContext.font = `400 ${numFS}px 'degular-mono', monospace`;
   drawingContext.letterSpacing = "-0.03em";
   let textW = drawingContext.measureText(numStr).width;
   let pillW = textW + padX * 2;
@@ -762,7 +762,7 @@ function drawUI() {
 
   drawingContext.save();
   drawingContext.fillStyle = "rgb(255,255,255)";
-  drawingContext.font = `400 ${numFS}px 'Degular Mono', monospace`;
+  drawingContext.font = `400 ${numFS}px 'degular-mono', monospace`;
   drawingContext.letterSpacing = "-0.03em";
   drawingContext.textAlign = "right";
   drawingContext.textBaseline = "top";
@@ -787,7 +787,7 @@ function drawToast() {
   let pad = sc(14);
 
   drawingContext.save();
-  drawingContext.font = `400 ${fs}px 'Degular Mono', monospace`;
+  drawingContext.font = `400 ${fs}px 'degular-mono', monospace`;
   drawingContext.letterSpacing = "0.04em";
   let tw = drawingContext.measureText(toastMsg).width;
   let bw = tw + pad * 2;
@@ -813,9 +813,9 @@ function drawHoldHint() {
   drawingContext.textAlign = "center";
   drawingContext.textBaseline = "middle";
   drawingContext.fillStyle = "rgba(0,0,255,1)";
-  drawingContext.font = `700 ${fs}px 'Degular Mono', monospace`;
+  drawingContext.font = `700 ${fs}px 'degular-mono', monospace`;
   drawingContext.fillText("Tippe weiter", cx, cy - sc(125));
-  drawingContext.font = `400 ${fs}px 'Degular Mono', monospace`;
+  drawingContext.font = `400 ${fs}px 'degular-mono', monospace`;
   drawingContext.fillText("2617 Berührungen,", cx, cy);
   drawingContext.fillText("die dich näher bringen", cx, cy + sc(80));
   drawingContext.restore();
@@ -924,21 +924,21 @@ function drawEndScreen() {
         drawingContext.fillStyle = col;
         drawingContext.fillText(item.text, x, curY);
       } else if (item.type === "sans-body") {
-        drawingContext.font = `400 ${sc(56)}px 'Degular Mono', monospace`;
+        drawingContext.font = `400 ${sc(56)}px 'degular-mono', monospace`;
         drawingContext.letterSpacing = "0.02em";
         drawingContext.textAlign = "left";
         drawingContext.textBaseline = "top";
         drawingContext.fillStyle = `rgba(255,255,255,${0.85 * alpha})`;
         drawingContext.fillText(item.text, x, curY);
       } else if (item.type === "sans-sm") {
-        drawingContext.font = `400 ${sc(42)}px 'Degular Mono', monospace`;
+        drawingContext.font = `400 ${sc(42)}px 'degular-mono', monospace`;
         drawingContext.letterSpacing = "0.03em";
         drawingContext.textAlign = "left";
         drawingContext.textBaseline = "top";
         drawingContext.fillStyle = `rgba(255,255,255,${0.7 * alpha})`;
         drawingContext.fillText(item.text, x, curY);
       } else if (item.type === "source") {
-        drawingContext.font = `400 ${sc(32)}px 'Degular Mono', monospace`;
+        drawingContext.font = `400 ${sc(32)}px 'degular-mono', monospace`;
         drawingContext.letterSpacing = "0.04em";
         drawingContext.textAlign = "left";
         drawingContext.textBaseline = "top";
@@ -962,7 +962,7 @@ function drawEndScreen() {
     let fs1 = sc(80);
 
     drawingContext.save();
-    drawingContext.font = `400 ${fs1}px 'Degular Mono', monospace`;
+    drawingContext.font = `400 ${fs1}px 'degular-mono', monospace`;
     drawingContext.letterSpacing = "0.18em";
     let btnText = "Neustart";
     let tw1 = drawingContext.measureText(btnText).width;
