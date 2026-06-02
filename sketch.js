@@ -109,8 +109,8 @@ const ATTRACTION = 0.0014;
 const DAMPING = 0.96;
 const EDGE_LEN = 600;
 
-const LIFE_STABLE = 18000;
-const LIFE_FADE = 14000;
+const LIFE_STABLE = 999999999;
+const LIFE_FADE = 999999999;
 
 // ── Kachel-Animation ──────────────────────────────────────────────────────────
 let tiles = [];
