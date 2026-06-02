@@ -109,8 +109,8 @@ const ATTRACTION = 0.0014;
 const DAMPING = 0.96;
 const EDGE_LEN = 600;
 
-const LIFE_STABLE = 999999999;
-const LIFE_FADE = 999999999;
+const LIFE_STABLE = 240000;
+const LIFE_FADE = 15000;
 
 // ── Kachel-Animation ──────────────────────────────────────────────────────────
 let tiles = [];
@@ -164,6 +164,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   imageMode(CENTER);
   SF = min(windowWidth, windowHeight) / 1080;
+  frameRate(30);
   spawnOnboardPulses();
   lastInteraction = millis();
 }
@@ -284,6 +285,7 @@ function addEdges(newNode) {
 
 // Gespeicherte Kanten zeichnen – bleiben permanent
 function drawEdges() {
+  edges = edges.filter((e) => nodes.includes(e.a) && nodes.includes(e.b));
   for (let e of edges) {
     let fadeA = min(1, ((millis() - e.a.born) / 1000) * 2.5);
     let fadeB = min(1, ((millis() - e.b.born) / 1000) * 2.5);
@@ -367,6 +369,8 @@ function applyForces() {
   for (let n of nodes) {
     n.vx *= DAMPING;
     n.vy *= DAMPING;
+    n.vx = constrain(n.vx, -15, 15);
+    n.vy = constrain(n.vy, -15, 15);
     n.x += n.vx;
     n.y += n.vy;
     let clamp = sc(20);
@@ -662,7 +666,7 @@ function drawNode(n) {
 
   if (n.kind === "dot") {
     noStroke();
-    let layers = 28;
+    let layers = 12;
     for (let s = 0; s < layers; s++) {
       let t = s / layers;
       let rx = n.rx * (0.05 + t * 0.95);
@@ -730,13 +734,14 @@ function drawNode(n) {
 // ── UI ────────────────────────────────────────────────────────────────────────
 
 function drawUI() {
+  drawingContext.globalAlpha = 1.0;
   let progress = 1 - counter / 2617;
   let BAR_H = sc(BAR_H_BASE);
 
   noStroke();
   fill(0, 0, 0, 10);
   rect(0, height - BAR_H, width, BAR_H);
-  fill(B[0], B[1], B[2], 255);
+  fill(0, 0, 255);
   rect(0, height - BAR_H, width * progress, BAR_H);
 
   counterFlash = max(0, counterFlash - 0.06);
@@ -1027,7 +1032,7 @@ function pressStart(id, x, y) {
   let dec;
   if (counter <= 3) dec = 1;
   else if (counter <= 10) dec = floor(random(1, 4));
-  else dec = floor(random(1, 0));
+  else dec = floor(random(1, 80));
   counter = max(0, counter - dec);
   touchCount++;
   counterFlash = 1.0;
