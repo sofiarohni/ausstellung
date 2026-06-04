@@ -18,45 +18,99 @@ let activePresses = {};
 const B = [0, 0, 255];
 
 let SF = 1;
-function sc(v) { return v * SF; }
+function sc(v) {
+  return v * SF;
+}
 
-const BAR_H_BASE  = 50;
-const MAX_DOT_R   = 350;
+const BAR_H_BASE = 50;
+const MAX_DOT_R = 350;
 const MAX_WORD_FS = 300;
 const MAX_PHOTO_W = 550;
-const GROW_RATE   = 1.25;
+const GROW_RATE = 1.25;
 
 const K_NEAREST = 3;
-const MAX_DIST  = 900;
+const MAX_DIST = 900;
 
 const WORDS_START = [
-  "Wärme","Haut","Hand","Finger","Wange","Schulter","Rücken","Puls",
-  "Nähe","Umarmung","Halten","Sanft","Weich","Kribbeln","Gänsehaut",
-  "Geborgen","Vertraut","Zuhause","Ankommen","Da sein","Bei dir","Ganz nah",
+  "Wärme",
+  "Haut",
+  "Hand",
+  "Finger",
+  "Wange",
+  "Schulter",
+  "Rücken",
+  "Puls",
+  "Nähe",
+  "Umarmung",
+  "Halten",
+  "Sanft",
+  "Weich",
+  "Kribbeln",
+  "Gänsehaut",
+  "Geborgen",
+  "Vertraut",
+  "Zuhause",
+  "Ankommen",
+  "Da sein",
+  "Bei dir",
+  "Ganz nah",
 ];
 const WORDS_MIDDLE = [
-  "Puls","Atmung","Zittern","Kribbeln","Gänsehaut","Innenraum","Spüren",
-  "Ausbreiten","Nachhallen","Still","Schwere","Getragen","Umhüllt",
-  "Eingehüllt","Aufgehen","Versinken","Verdichten","Zu nah","Zu viel",
+  "Puls",
+  "Atmung",
+  "Zittern",
+  "Kribbeln",
+  "Gänsehaut",
+  "Innenraum",
+  "Spüren",
+  "Ausbreiten",
+  "Nachhallen",
+  "Still",
+  "Schwere",
+  "Getragen",
+  "Umhüllt",
+  "Eingehüllt",
+  "Aufgehen",
+  "Versinken",
+  "Verdichten",
+  "Zu nah",
+  "Zu viel",
 ];
 const WORDS_END = [
-  "Glas","Display","Oberfläche","Glatt","Kalt","Still","Lautlos","Wischen",
-  "Tippen","Scrollen","Endlos","Fläche","Gleiten","Spurlos","Verblassen",
-  "Schatten","Abbild","Simulation","Echo","Schnell",
+  "Glas",
+  "Display",
+  "Oberfläche",
+  "Glatt",
+  "Kalt",
+  "Still",
+  "Lautlos",
+  "Wischen",
+  "Tippen",
+  "Scrollen",
+  "Endlos",
+  "Fläche",
+  "Gleiten",
+  "Spurlos",
+  "Verblassen",
+  "Schatten",
+  "Abbild",
+  "Simulation",
+  "Echo",
+  "Schnell",
 ];
 
-const REPULSION   = 70000;
-const ATTRACTION  = 0.0014;
-const DAMPING     = 0.96;
-const EDGE_LEN    = 600;
+const REPULSION = 70000;
+const ATTRACTION = 0.0014;
+const DAMPING = 0.96;
+const EDGE_LEN = 600;
 const LIFE_STABLE = 240000;
-const LIFE_FADE   = 15000;
+const LIFE_FADE = 15000;
 
-let onboardPhase     = 0;
+let onboardPhase = 0;
 let onboardHintTimer = 0;
 
 // ── Blur-Übergang ─────────────────────────────────────────────────────────────
-let exitAnim  = false;
+let exitAnim = false;
 let exitStart = 0;
 const EXIT_DURATION = 1600; // ms — langsamer Zoom
 
@@ -71,9 +125,9 @@ const TOAST_DURATION = 3500;
 let counterFlash = 0;
 
 let lastInteraction = 0;
-const IDLE_TIMEOUT  = 300000;
+const IDLE_TIMEOUT = 300000;
 
-let endPulsesReady      = false;
+let endPulsesReady = false;
 let endCounterStartTime = 0;
 const END_COUNTER_DURATION = 2500;
 
@@ -99,26 +153,29 @@ function windowResized() {
 function resetAll() {
   counter = 2617;
   started = false;
-  nodes   = [];
-  edges   = [];
-  touchCount    = 0;
-  finished      = false;
-  finishTime    = 0;
-  restartAlpha  = 0;
-  restarting    = false;
+  nodes = [];
+  edges = [];
+  touchCount = 0;
+  finished = false;
+  finishTime = 0;
+  restartAlpha = 0;
+  restarting = false;
   activePresses = {};
-  onboardPhase  = 0;
-  onboardHintTimer  = 0;
+  onboardPhase = 0;
+  onboardHintTimer = 0;
   restartBtnVisible = false;
-  exitAnim  = false;
+  exitAnim = false;
   exitStart = 0;
-  toastMsg  = "";
-  toastTimer    = 0;
-  toast33Shown  = false;
-  toast66Shown  = false;
+  toastMsg = "";
+  toastTimer = 0;
+  toast33Shown = false;
+  toast66Shown = false;
   // Zoom-Transform zurücksetzen
-  let canvas = document.querySelector('canvas');
-  if (canvas) { canvas.style.transform = ''; canvas.style.opacity = ''; }
+  let canvas = document.querySelector("canvas");
+  if (canvas) {
+    canvas.style.transform = "";
+    canvas.style.opacity = "";
+  }
 }
 
 // ── Draw ───────────────────────────────────────────────────────────────────────
@@ -136,7 +193,8 @@ function draw() {
 
   if (started && !finished && !restarting) {
     if (millis() - lastInteraction > IDLE_TIMEOUT) {
-      restarting = true; restartAlpha = 0;
+      restarting = true;
+      restartAlpha = 0;
     }
   }
 
@@ -145,7 +203,10 @@ function draw() {
     return;
   }
 
-  if (finished) { drawEndScreen(); return; }
+  if (finished) {
+    drawEndScreen();
+    return;
+  }
 
   for (let key in activePresses) {
     let p = activePresses[key];
@@ -159,8 +220,8 @@ function draw() {
     if (getDecay(nodes[i]) >= 1) {
       nodes.splice(i, 1);
       for (let key in activePresses) {
-        if (activePresses[key].nodeIdx === i)     activePresses[key].nodeIdx = -1;
-        else if (activePresses[key].nodeIdx > i)  activePresses[key].nodeIdx--;
+        if (activePresses[key].nodeIdx === i) activePresses[key].nodeIdx = -1;
+        else if (activePresses[key].nodeIdx > i) activePresses[key].nodeIdx--;
       }
     }
   }
@@ -178,33 +239,34 @@ function draw() {
 function drawStartScreen() {
   let cx = width / 2;
   let cy = height / 2;
-  let t  = millis();
+  let t = millis();
 
   // Blur via CSS-Filter auf Canvas
   // Zoom-In Transition: Canvas wird in die Mitte hinein gezoomt (skaliert hoch)
   // und faded gleichzeitig aus → wirkt als würde man in den weißen Bereich eintauchen
   if (exitAnim) {
     let progress = min(1, (t - exitStart) / EXIT_DURATION);
-    let eased    = progress < 0.5
-      ? 2 * progress * progress
-      : 1 - pow(-2 * progress + 2, 2) / 2; // ease-in-out
+    let eased =
+      progress < 0.5
+        ? 2 * progress * progress
+        : 1 - pow(-2 * progress + 2, 2) / 2; // ease-in-out
     // Zoom: von 1x auf 2x, alpha faded erst in der zweiten Hälfte aus
-    let zoom   = 1 + eased * 1.0;
-    let alphaV = progress < 0.3 ? 1 : 1 - ((progress - 0.3) / 0.7);
-    let canvas = document.querySelector('canvas');
+    let zoom = 1 + eased * 1.0;
+    let alphaV = progress < 0.3 ? 1 : 1 - (progress - 0.3) / 0.7;
+    let canvas = document.querySelector("canvas");
     if (canvas) {
-      canvas.style.transformOrigin = '50% 50%';
-      canvas.style.transform       = `scale(${zoom})`;
-      canvas.style.opacity         = alphaV;
+      canvas.style.transformOrigin = "50% 50%";
+      canvas.style.transform = `scale(${zoom})`;
+      canvas.style.opacity = alphaV;
     }
     if (progress >= 1) {
       exitAnim = false;
-      started  = true;
-      onboardPhase     = 1;
+      started = true;
+      onboardPhase = 1;
       onboardHintTimer = true;
       if (canvas) {
-        canvas.style.transform = '';
-        canvas.style.opacity   = '';
+        canvas.style.transform = "";
+        canvas.style.opacity = "";
       }
       return;
     }
@@ -215,21 +277,26 @@ function drawStartScreen() {
     let imgAspect = imgBg.width / imgBg.height;
     let scrAspect = width / height;
     let drawW, drawH;
-    if (scrAspect > imgAspect) { drawW = width;  drawH = width / imgAspect; }
-    else                       { drawH = height; drawW = height * imgAspect; }
+    if (scrAspect > imgAspect) {
+      drawW = width;
+      drawH = width / imgAspect;
+    } else {
+      drawH = height;
+      drawW = height * imgAspect;
+    }
     image(imgBg, cx, cy, drawW, drawH);
   }
 
   // ── Schicht 2: blauer Blob — atmet nur, keine Ringe ─────────────────────
-  let baseR   = min(width, height) * 0.52;
-  let pulse   = sin(t * 0.0018) * 0.05;
+  let baseR = min(width, height) * 0.52;
+  let pulse = sin(t * 0.0018) * 0.05;
   let circleR = baseR * (1 + pulse);
 
   let grad = drawingContext.createRadialGradient(cx, cy, 0, cx, cy, circleR);
-  grad.addColorStop(0,    "rgba(0,0,255,1)");
+  grad.addColorStop(0, "rgba(0,0,255,1)");
   grad.addColorStop(0.65, "rgba(0,0,255,0.95)");
   grad.addColorStop(0.88, "rgba(0,0,255,0.45)");
-  grad.addColorStop(1.0,  "rgba(0,0,255,0)");
+  grad.addColorStop(1.0, "rgba(0,0,255,0)");
   drawingContext.fillStyle = grad;
   drawingContext.beginPath();
   drawingContext.arc(cx, cy, circleR, 0, Math.PI * 2);
@@ -244,8 +311,8 @@ function drawStartScreen() {
   drawingContext.textBaseline = "middle";
   // Weiße Kontur — dick genug dass sich Ziffern überlappen, aber Zahl noch lesbar
   drawingContext.strokeStyle = "rgba(255,255,255,1)";
-  drawingContext.lineWidth   = sc(52);
-  drawingContext.lineJoin    = "round";
+  drawingContext.lineWidth = sc(52);
+  drawingContext.lineJoin = "round";
   drawingContext.strokeText("2617", cx, cy);
   // Füllung oben drauf
   drawingContext.fillStyle = "rgba(255,255,255,1)";
@@ -253,7 +320,7 @@ function drawStartScreen() {
   drawingContext.restore();
 
   // ── Schicht 4: Wortboxen mit Verbindungslinien ───────────────────────────
-  let fs  = sc(52);
+  let fs = sc(52);
   let pad = sc(8);
   drawingContext.save();
   drawingContext.font = `400 ${fs}px 'degular-mono', monospace`;
@@ -263,15 +330,16 @@ function drawStartScreen() {
 
   let labels = [
     { text: "Spür", x: width * 0.19, y: height * 0.38 },
-    { text: "mal",  x: width * 0.34, y: height * 0.44 },
+    { text: "mal", x: width * 0.34, y: height * 0.44 },
     { text: "nach", x: width * 0.63, y: height * 0.74 },
   ];
 
-  let boxes = labels.map(lb => {
+  let boxes = labels.map((lb) => {
     let tw = drawingContext.measureText(lb.text).width;
     return {
       text: lb.text,
-      x: lb.x, y: lb.y,
+      x: lb.x,
+      y: lb.y,
       w: tw + pad * 2,
       h: fs + pad * 2,
       cx: lb.x - pad + (tw + pad * 2) / 2,
@@ -317,11 +385,18 @@ function growNode(n) {
     n.rx = min(n.rx + GROW_RATE * n.stretchX, sc(MAX_DOT_R) * n.stretchX);
     n.ry = min(n.ry + GROW_RATE * n.stretchY, sc(MAX_DOT_R) * n.stretchY);
   } else if (n.kind === "word") {
-    n.fontSize = min(n.fontSize + GROW_RATE * 0.5 * ((n.stretchX + n.stretchY) / 2), sc(MAX_WORD_FS));
-    n.scaleX = n.stretchX; n.scaleY = n.stretchY;
+    n.fontSize = min(
+      n.fontSize + GROW_RATE * 0.5 * ((n.stretchX + n.stretchY) / 2),
+      sc(MAX_WORD_FS)
+    );
+    n.scaleX = n.stretchX;
+    n.scaleY = n.stretchY;
   } else if (n.kind === "photo") {
     n.pw = min(n.pw + GROW_RATE * 2 * n.stretchX, sc(MAX_PHOTO_W) * n.stretchX);
-    n.ph = min(n.ph + GROW_RATE * 2 * n.stretchY, sc(MAX_PHOTO_W) * 1.4 * n.stretchY);
+    n.ph = min(
+      n.ph + GROW_RATE * 2 * n.stretchY,
+      sc(MAX_PHOTO_W) * 1.4 * n.stretchY
+    );
   }
 }
 
@@ -335,33 +410,43 @@ function randomStretch() {
 
 function getWord() {
   let progress = 1 - counter / 3311;
-  let list = progress < 0.33 ? WORDS_START : progress < 0.66 ? WORDS_MIDDLE : WORDS_END;
+  let list =
+    progress < 0.33 ? WORDS_START : progress < 0.66 ? WORDS_MIDDLE : WORDS_END;
   return list[floor(random(list.length))];
 }
 
 function createNode(x, y) {
   let roll = random();
   let kind = roll < 0.4 ? "dot" : roll < 0.75 ? "word" : "photo";
-  let st   = randomStretch();
+  let st = randomStretch();
   let initR = sc(12);
   let selectedPhoto = photos[floor(random(photos.length))];
   return {
     x: x + random(-sc(80), sc(80)),
     y: y + random(-sc(80), sc(80)),
-    vx: 0, vy: 0,
+    vx: 0,
+    vy: 0,
     born: millis(),
-    kind, pulse: 0, hit: false,
-    stretchX: st.sx, stretchY: st.sy,
-    scaleX: 1, scaleY: 1,
+    kind,
+    pulse: 0,
+    hit: false,
+    stretchX: st.sx,
+    stretchY: st.sy,
+    scaleX: 1,
+    scaleY: 1,
     rx: kind === "dot" ? initR * st.sx : 0,
     ry: kind === "dot" ? initR * st.sy : 0,
     fontSize: kind === "word" ? sc(9) : 0,
-    weight: [100,200,300,400,700,900][floor(random(6))],
-    letterSpacing: [-0.02,0,0.06,0.14,0.22][floor(random(5))],
+    weight: [100, 200, 300, 400, 700, 900][floor(random(6))],
+    letterSpacing: [-0.02, 0, 0.06, 0.14, 0.22][floor(random(5))],
     inverted: kind === "word" && random() < 0.15,
     pw: kind === "photo" ? sc(50) : 0,
-    ph: kind === "photo" ? sc(50) * (selectedPhoto ? selectedPhoto.height / selectedPhoto.width : 1.3) : 0,
-    tinted:   kind === "photo" && random() < 0.25,
+    ph:
+      kind === "photo"
+        ? sc(50) *
+          (selectedPhoto ? selectedPhoto.height / selectedPhoto.width : 1.3)
+        : 0,
+    tinted: kind === "photo" && random() < 0.25,
     scanLine: kind === "photo" && random() < 0.35,
     accent: false,
     word: getWord(),
@@ -382,11 +467,11 @@ function addEdges(newNode) {
 }
 
 function drawEdges() {
-  edges = edges.filter(e => nodes.includes(e.a) && nodes.includes(e.b));
+  edges = edges.filter((e) => nodes.includes(e.a) && nodes.includes(e.b));
   for (let e of edges) {
     let fadeA = min(1, ((millis() - e.a.born) / 1000) * 2.5);
     let fadeB = min(1, ((millis() - e.b.born) / 1000) * 2.5);
-    let fadeE = min(1, ((millis() - e.born)   / 1000) * 2.5);
+    let fadeE = min(1, ((millis() - e.born) / 1000) * 2.5);
     let alpha = min(fadeA, fadeB, fadeE);
     if (alpha < 0.01) continue;
     stroke(B[0], B[1], B[2], 220 * alpha);
@@ -398,32 +483,37 @@ function drawEdges() {
 }
 
 function applyForces() {
-  let rep  = REPULSION * SF * SF;
+  let rep = REPULSION * SF * SF;
   let maxD = sc(MAX_DIST);
 
   for (let i = 0; i < nodes.length; i++) {
-    let a  = nodes[i];
+    let a = nodes[i];
     let dA = getDecay(a);
     for (let j = i + 1; j < nodes.length; j++) {
-      let b  = nodes[j];
-      let dx = a.x - b.x, dy = a.y - b.y;
-      let d  = max(dist(a.x, a.y, b.x, b.y), 1);
-      let f  = rep / (d * d);
-      a.vx += (dx / d) * f;  a.vy += (dy / d) * f;
-      b.vx -= (dx / d) * f;  b.vy -= (dy / d) * f;
+      let b = nodes[j];
+      let dx = a.x - b.x,
+        dy = a.y - b.y;
+      let d = max(dist(a.x, a.y, b.x, b.y), 1);
+      let f = rep / (d * d);
+      a.vx += (dx / d) * f;
+      a.vy += (dy / d) * f;
+      b.vx -= (dx / d) * f;
+      b.vy -= (dy / d) * f;
     }
     if (dA > 0) {
-      a.vx *= 0.95; a.vy *= 0.95;
+      a.vx *= 0.95;
+      a.vy *= 0.95;
     } else {
       a.vx += random(-0.005, 0.005);
       a.vy += random(-0.005, 0.005);
-      let cxf = width / 2, cyf = height / 2;
+      let cxf = width / 2,
+        cyf = height / 2;
       a.vx += (cxf - a.x) * 0.0006;
       a.vy += (cyf - a.y) * 0.0006;
       let margin = sc(180);
-      if (a.x < margin)          a.vx += (margin - a.x)            * 0.03;
-      if (a.x > width - margin)  a.vx -= (a.x - (width - margin))  * 0.03;
-      if (a.y < margin)          a.vy += (margin - a.y)            * 0.03;
+      if (a.x < margin) a.vx += (margin - a.x) * 0.03;
+      if (a.x > width - margin) a.vx -= (a.x - (width - margin)) * 0.03;
+      if (a.y < margin) a.vy += (margin - a.y) * 0.03;
       if (a.y > height - margin) a.vy -= (a.y - (height - margin)) * 0.03;
     }
   }
@@ -439,43 +529,61 @@ function applyForces() {
     candidates.sort((x, y) => x.d - y.d);
     for (let { b, d } of candidates.slice(0, K_NEAREST)) {
       let pull = (1 - max(getDecay(a), getDecay(b))) * ATTRACTION;
-      let dx = b.x - a.x, dy = b.y - a.y;
+      let dx = b.x - a.x,
+        dy = b.y - a.y;
       let len = max(d, 1);
-      let dp  = (d - sc(EDGE_LEN)) * pull;
-      a.vx += (dx / len) * dp;  a.vy += (dy / len) * dp;
-      b.vx -= (dx / len) * dp;  b.vy -= (dy / len) * dp;
+      let dp = (d - sc(EDGE_LEN)) * pull;
+      a.vx += (dx / len) * dp;
+      a.vy += (dy / len) * dp;
+      b.vx -= (dx / len) * dp;
+      b.vy -= (dy / len) * dp;
     }
   }
 
   for (let n of nodes) {
-    n.vx *= DAMPING; n.vy *= DAMPING;
+    n.vx *= DAMPING;
+    n.vy *= DAMPING;
     n.vx = constrain(n.vx, -15, 15);
     n.vy = constrain(n.vy, -15, 15);
-    n.x += n.vx; n.y += n.vy;
+    n.x += n.vx;
+    n.y += n.vy;
     let clamp = sc(20);
-    if (n.x < clamp)           { n.x = clamp;           n.vx *= -0.1; }
-    if (n.x > width  - clamp)  { n.x = width  - clamp;  n.vx *= -0.1; }
-    if (n.y < clamp)           { n.y = clamp;           n.vy *= -0.1; }
-    if (n.y > height - clamp)  { n.y = height - clamp;  n.vy *= -0.1; }
+    if (n.x < clamp) {
+      n.x = clamp;
+      n.vx *= -0.1;
+    }
+    if (n.x > width - clamp) {
+      n.x = width - clamp;
+      n.vx *= -0.1;
+    }
+    if (n.y < clamp) {
+      n.y = clamp;
+      n.vy *= -0.1;
+    }
+    if (n.y > height - clamp) {
+      n.y = height - clamp;
+      n.vy *= -0.1;
+    }
   }
 }
 
 function drawNode(n) {
-  let age    = (millis() - n.born) / 1000;
+  let age = (millis() - n.born) / 1000;
   let fadeIn = min(1, age * 3);
-  let decay  = getDecay(n);
-  let alpha  = fadeIn * (1 - decay);
+  let decay = getDecay(n);
+  let alpha = fadeIn * (1 - decay);
   if (alpha <= 0.01) return;
-  let x = n.x, y = n.y;
+  let x = n.x,
+    y = n.y;
 
   if (n.kind === "dot") {
     noStroke();
     let layers = 12;
     for (let s = 0; s < layers; s++) {
-      let t  = s / layers;
+      let t = s / layers;
       let rx = n.rx * (0.05 + t * 0.95);
       let ry = n.ry * (0.05 + t * 0.95);
-      let a  = exp(-t * t * 4.5) * 230 * alpha;
+      let a = exp(-t * t * 4.5) * 230 * alpha;
       fill(B[0], B[1], B[2], a);
       ellipse(x, y, rx * 2, ry * 2);
     }
@@ -483,12 +591,17 @@ function drawNode(n) {
     noStroke();
     if (n.inverted) {
       let pad = sc(6);
-      let tw  = n.fontSize * n.word.length * 0.62;
+      let tw = n.fontSize * n.word.length * 0.62;
       drawingContext.save();
       drawingContext.translate(x, y);
       drawingContext.scale(n.scaleX || 1, n.scaleY || 1);
       drawingContext.fillStyle = `rgba(0,0,255,${0.9 * alpha})`;
-      drawingContext.fillRect(-tw/2 - pad, -n.fontSize * 0.72 - pad, tw + pad*2, n.fontSize + pad*2);
+      drawingContext.fillRect(
+        -tw / 2 - pad,
+        -n.fontSize * 0.72 - pad,
+        tw + pad * 2,
+        n.fontSize + pad * 2
+      );
       drawingContext.font = `bold italic ${n.fontSize}px 'Averia Serif Libre', serif`;
       drawingContext.letterSpacing = "0.06em";
       drawingContext.textAlign = "center";
@@ -533,7 +646,7 @@ function drawNode(n) {
 function drawUI() {
   drawingContext.globalAlpha = 1.0;
   let progress = 1 - counter / 2617;
-  let BAR_H    = sc(BAR_H_BASE);
+  let BAR_H = sc(BAR_H_BASE);
 
   noStroke();
   fill(0, 0, 0, 10);
@@ -544,9 +657,9 @@ function drawUI() {
   counterFlash = max(0, counterFlash - 0.06);
 
   let numStr = counter.toLocaleString("de-DE");
-  let numFS  = sc(125);
-  let padX   = sc(20);
-  let padY   = sc(10);
+  let numFS = sc(125);
+  let padX = sc(20);
+  let padY = sc(10);
 
   drawingContext.save();
   drawingContext.font = `400 ${numFS}px 'degular-mono', monospace`;
@@ -575,11 +688,15 @@ function drawUI() {
 function drawToast() {
   if (!toastMsg || toastTimer === 0) return;
   let age = millis() - toastTimer;
-  if (age > TOAST_DURATION) { toastMsg = ""; return; }
-  let fadeIn  = min(1, age / 300);
-  let fadeOut = age > TOAST_DURATION - 600 ? 1 - (age - (TOAST_DURATION - 600)) / 600 : 1;
-  let alpha   = fadeIn * fadeOut;
-  let fs  = sc(125);
+  if (age > TOAST_DURATION) {
+    toastMsg = "";
+    return;
+  }
+  let fadeIn = min(1, age / 300);
+  let fadeOut =
+    age > TOAST_DURATION - 600 ? 1 - (age - (TOAST_DURATION - 600)) / 600 : 1;
+  let alpha = fadeIn * fadeOut;
+  let fs = sc(125);
   let pad = sc(14);
   drawingContext.save();
   drawingContext.font = `400 ${fs}px 'degular-mono', monospace`;
@@ -599,7 +716,8 @@ function drawToast() {
 }
 
 function drawHoldHint() {
-  let cx = width / 2, cy = height / 2;
+  let cx = width / 2,
+    cy = height / 2;
   let fs = sc(64);
   drawingContext.save();
   drawingContext.letterSpacing = "0.12em";
@@ -616,15 +734,15 @@ function drawHoldHint() {
 
 // ── Endscreen ─────────────────────────────────────────────────────────────────
 function initEndPulses() {
-  endPulsesReady      = true;
+  endPulsesReady = true;
   endCounterStartTime = millis();
 }
 
 const END_DOC = [
-  { type: "serif-lg",  text: "Das waren fast" },
-  { type: "serif-xl",  text: "COUNTER" },
-  { type: "serif-lg",  text: "Berührungen an einem Tag." },
-  { type: "serif-lg",  text: "Deinem Tag." },
+  { type: "serif-lg", text: "Das waren fast" },
+  { type: "serif-xl", text: "COUNTER" },
+  { type: "serif-lg", text: "Berührungen an einem Tag." },
+  { type: "serif-lg", text: "Deinem Tag." },
   { type: "gap", h: 48 },
   { type: "sans-body", text: "Gerade eben hast du den Screen berührt." },
   { type: "sans-body", text: "Fast selbstverständlich." },
@@ -644,15 +762,20 @@ const END_DOC = [
   { type: "sans-body", text: "Keine Wärme. Keine Antwort." },
   { type: "sans-body", text: "Nur Oberfläche." },
   { type: "gap", h: 48 },
-  { type: "serif-lg",  text: "Sind wir alle ein bisschen" },
-  { type: "serif-lg",  text: "out of touch?" },
+  { type: "serif-lg", text: "Sind wir alle ein bisschen" },
+  { type: "serif-lg", text: "out of touch?" },
   { type: "gap", h: 60 },
 ];
 
 function endDocH(item) {
   const base = {
-    "serif-xl": 280, "serif-lg": 150, "sans-body": 90,
-    "sans-sm": 80, source: 55, rule: 1, gap: item.h || 20,
+    "serif-xl": 280,
+    "serif-lg": 150,
+    "sans-body": 90,
+    "sans-sm": 80,
+    source: 55,
+    rule: 1,
+    gap: item.h || 20,
   };
   return sc(base[item.type] || 110);
 }
@@ -663,19 +786,22 @@ function drawEndScreen() {
   if (!endPulsesReady) initEndPulses();
 
   let elapsed = (millis() - finishTime) / 1000;
-  let totalH  = 0;
+  let totalH = 0;
   for (let item of END_DOC) totalH += endDocH(item);
 
   let leftMargin = max(sc(100), width * 0.1);
-  let curY       = height / 2 - totalH / 2;
-  let delay      = 0.2;
+  let curY = height / 2 - totalH / 2;
+  let delay = 0.2;
 
   for (let i = 0; i < END_DOC.length; i++) {
-    let item  = END_DOC[i];
-    let lh    = endDocH(item);
-    let age   = elapsed - i * delay;
+    let item = END_DOC[i];
+    let lh = endDocH(item);
+    let age = elapsed - i * delay;
     let alpha = min(1, age * 3.5);
-    if (alpha <= 0) { curY += lh; continue; }
+    if (alpha <= 0) {
+      curY += lh;
+      continue;
+    }
     let x = leftMargin;
 
     if (item.type === "gap") {
@@ -689,10 +815,16 @@ function drawEndScreen() {
       drawingContext.save();
       if (item.type === "serif-xl") {
         let e2617 = millis() - endCounterStartTime;
-        let displayStr = item.text === "COUNTER"
-          ? Math.min(2617, Math.round((e2617 / END_COUNTER_DURATION) * 2617)).toLocaleString("de-DE")
-          : item.text;
-        drawingContext.font = `bold italic ${sc(260)}px 'Averia Serif Libre', serif`;
+        let displayStr =
+          item.text === "COUNTER"
+            ? Math.min(
+                2617,
+                Math.round((e2617 / END_COUNTER_DURATION) * 2617)
+              ).toLocaleString("de-DE")
+            : item.text;
+        drawingContext.font = `bold italic ${sc(
+          260
+        )}px 'Averia Serif Libre', serif`;
         drawingContext.letterSpacing = "-0.03em";
         drawingContext.textAlign = "left";
         drawingContext.textBaseline = "top";
@@ -702,7 +834,9 @@ function drawEndScreen() {
         drawingContext.fillStyle = `rgba(255,255,255,${alpha})`;
         drawingContext.fillText(displayStr, x, curY);
       } else if (item.type === "serif-lg") {
-        drawingContext.font = `bold italic ${sc(120)}px 'Averia Serif Libre', serif`;
+        drawingContext.font = `bold italic ${sc(
+          120
+        )}px 'Averia Serif Libre', serif`;
         drawingContext.letterSpacing = "0.01em";
         drawingContext.textAlign = "left";
         drawingContext.textBaseline = "top";
@@ -745,10 +879,10 @@ function drawEndScreen() {
   let textDone = END_DOC.length * delay + 0.8;
   if (elapsed > textDone) {
     let btnAge = elapsed - textDone;
-    let btnA   = min(1, btnAge * 1.2);
-    let leftM  = leftMargin;
-    let btnY   = curY + sc(32);
-    let fs1    = sc(80);
+    let btnA = min(1, btnAge * 1.2);
+    let leftM = leftMargin;
+    let btnY = curY + sc(32);
+    let fs1 = sc(80);
     drawingContext.save();
     drawingContext.font = `400 ${fs1}px 'degular-mono', monospace`;
     drawingContext.letterSpacing = "0.18em";
@@ -781,41 +915,55 @@ function pressStart(id, x, y) {
   if (finished) {
     if (
       restartBtnVisible &&
-      x >= restartBtnX && x <= restartBtnX + restartBtnW &&
-      y >= restartBtnY && y <= restartBtnY + restartBtnH
+      x >= restartBtnX &&
+      x <= restartBtnX + restartBtnW &&
+      y >= restartBtnY &&
+      y <= restartBtnY + restartBtnH
     ) {
-      restarting = true; restartAlpha = 0;
+      restarting = true;
+      restartAlpha = 0;
     }
     return;
   }
 
   if (!started && !exitAnim) {
     lastInteraction = millis();
-    exitAnim  = true;
+    exitAnim = true;
     exitStart = millis();
     return;
   }
 
   if (exitAnim) return;
 
-  if (onboardHintTimer === true) { onboardHintTimer = false; return; }
+  if (onboardHintTimer === true) {
+    onboardHintTimer = false;
+    return;
+  }
   if (counter <= 0) return;
 
   let dec;
-  if (counter <= 3)       dec = 1;
-  else if (counter <= 10) dec = floor(random(1, 4));
-  else                    dec = floor(random(1, 80));
+  if (counter <= 3) {
+    dec = 1; // immer genau 1, damit 3→2→1→0
+  } else if (counter <= 10) {
+    dec = min(floor(random(1, 4)), counter - 3); // nie unter 3 springen
+  } else {
+    dec = min(floor(random(1, 80)), counter - 3); // nie unter 3 springen
+  }
   counter = max(0, counter - dec);
   touchCount++;
-  counterFlash    = 1.0;
+  counterFlash = 1.0;
   lastInteraction = millis();
 
   let progress = 1 - counter / 2617;
   if (!toast33Shown && progress >= 0.25) {
-    toast33Shown = true; toastMsg = "Du kommst näher!"; toastTimer = millis();
+    toast33Shown = true;
+    toastMsg = "Du kommst näher!";
+    toastTimer = millis();
   }
   if (!toast66Shown && progress >= 0.66) {
-    toast66Shown = true; toastMsg = "Fast greifbar!"; toastTimer = millis();
+    toast66Shown = true;
+    toastMsg = "Fast greifbar!";
+    toastTimer = millis();
   }
 
   let node = createNode(x, y);
@@ -824,21 +972,30 @@ function pressStart(id, x, y) {
   activePresses[id] = { nodeIdx: nodes.length - 1 };
 
   if (counter <= 0 && !finished) {
-    setTimeout(() => { finished = true; finishTime = millis(); }, 2000);
+    setTimeout(() => {
+      finished = true;
+      finishTime = millis();
+    }, 2000);
   }
 }
 
-function pressEnd(id) { delete activePresses[id]; }
+function pressEnd(id) {
+  delete activePresses[id];
+}
 
-function mousePressed()  { pressStart("mouse", mouseX, mouseY); }
-function mouseReleased() { pressEnd("mouse"); }
+function mousePressed() {
+  pressStart("mouse", mouseX, mouseY);
+}
+function mouseReleased() {
+  pressEnd("mouse");
+}
 
 function touchStarted() {
   for (let t of touches) pressStart(t.id, t.x, t.y);
   return false;
 }
 function touchEnded() {
-  let activeIds = new Set(touches.map(t => t.id));
+  let activeIds = new Set(touches.map((t) => t.id));
   for (let key in activePresses) {
     if (key !== "mouse" && !activeIds.has(parseInt(key))) pressEnd(key);
   }
