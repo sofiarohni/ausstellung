@@ -755,7 +755,7 @@ const END_DOC = [
   { type: "sans-body", text: "Dabei ist Berührung essenziell." },
   { type: "sans-body", text: "Über die Haut erfahren wir Wärme," },
   { type: "sans-body", text: "Nähe und Vertrauen." },
-  { type: "sans-body", text: "Oxytocin entsteht — ein Hormon," },
+  { type: "sans-body", text: "Oxytocin entsteht, ein Hormon," },
   { type: "sans-body", text: "das uns verbindet, uns hält." },
   { type: "gap", h: 36 },
   { type: "sans-body", text: "Doch hier bleibt es still." },
